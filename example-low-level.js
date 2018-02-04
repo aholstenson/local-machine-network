@@ -1,9 +1,10 @@
 'use strict';
 
+const path = require('path');
 const LowLevelNetwork = require('./low-level');
 
 const net = new LowLevelNetwork({
-	path: '../socket'
+	path: path.join('..', 'socket')
 });
 
 net.on('leader', socket => {
