@@ -26,19 +26,19 @@ net.on('connection', other => {
 });
 
 net.on('message', { returnPath, data } => {
-	console.log('Got a message:', data);
+  console.log('Got a message:', data);
 
-	if(data.type === 'request') {
-		// If type is request send something back
-		returnPath.send({
-			type: 'response',
-		});
-	}
+  if(data.type === 'request') {
+    // If type is request send something back
+    returnPath.send({
+      type: 'response',
+    });
+  }
 });
 
 // Send a message to the leader - with any valid JSON
 net.send({
-	type: 'request',
+  type: 'request',
 });
 ```
 
