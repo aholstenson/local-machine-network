@@ -6,16 +6,16 @@ const net = new LowLevelNetwork({
 	path: '../socket'
 });
 
-net.on('leader', () => {
+net.on('leader', socket => {
 	console.log('This instance is the leader!');
 });
 
-net.on('connected', (socket, isSelf) => {
-	console.log('Connected to the leader:', socket);
+net.on('connected', socket => {
+	console.log('Connected to the leader');
 });
 
 net.on('connection', socket => {
-	console.log('Incoming connection from someone else:', socket);
+	console.log('Incoming connection from someone else');
 });
 
 

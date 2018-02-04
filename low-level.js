@@ -115,8 +115,12 @@ module.exports = class LowLevelNetwork extends EventEmitter {
 
 				setTimeout(() => this.attemptConnectOrBind(callback), retryTime);
 			} else {
+				debug('Connected to leader');
+
 				this.client = client;
 				this.emit('connected', client);
+
+				callback();
 			}
 		});
 
@@ -156,6 +160,7 @@ module.exports = class LowLevelNetwork extends EventEmitter {
 					);
 				} else {
 					// Server was succesfully bound, store reference and resolve callback
+					debug('Hosting network as leader');
 					this.server = server;
 
 					// Mark as leader and emit event

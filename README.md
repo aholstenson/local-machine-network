@@ -8,6 +8,40 @@ Provides a local machine network for simple inter-process communication (IPC).
 npm install local-machine-network
 ```
 
+## Object based messaging
+
+```javascript
+const { ObjectNetwork } = require('local-machine-network');
+
+const net = new LowLevelNetwork({
+  path: 'path-to-socket'
+});
+
+net.on('leader', () => {
+  console.log('This instance is the leader!');
+});
+
+net.on('connection', other => {
+  console.log('Incoming connection from someone else:', other);
+});
+
+net.on('message', { returnPath, data } => {
+	console.log('Got a message:', data);
+
+	if(data.type === 'request') {
+		// If type is request send something back
+		returnPath.send({
+			type: 'response',
+		});
+	}
+});
+
+// Send a message to the leader - with any valid JSON
+net.send({
+	type: 'request',
+});
+```
+
 ## Low-level networks
 
 ```javascript
