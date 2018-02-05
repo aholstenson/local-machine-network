@@ -43,13 +43,13 @@ net.on('message', { returnPath, data } => {
 
 // Connect to the network
 net.connect()
-	.then(() => {
-		// Send a message to the leader - with any valid JSON
-		net.send({
-			type: 'request',
-		});
-	})
-	.catch(handleConnectionError);
+  .then(() => {
+    // Send a message to the leader - with any valid JSON
+    net.send({
+      type: 'request',
+    });
+  })
+  .catch(handleConnectionError);
 ```
 
 ## Low-level networks
@@ -84,6 +84,6 @@ net.on('connection', socket => {
 
 // Connect to the network
 net.connect()
-	.then(...)
-	.catch(handleConnectionError);
+  .then(...)
+  .catch(handleConnectionError);
 ```
