@@ -1,6 +1,11 @@
 # local-machine-network
 
+[![npm version](https://badge.fury.io/js/local-machine-network.svg)](https://badge.fury.io/js/local-machine-network)
+[![Dependencies](https://david-dm.org/aholstenson/local-machine-network.svg)](https://david-dm.org/aholstenson/local-machine-network)
+
 Provides a local machine network for simple inter-process communication (IPC).
+Comes in two variants, one for exchanging objects between the leader and client
+and one for getting the raw sockets.
 
 ## Installation
 
@@ -13,7 +18,7 @@ npm install local-machine-network
 ```javascript
 const { ObjectNetwork } = require('local-machine-network');
 
-const net = new LowLevelNetwork({
+const net = new ObjectNetwork({
   path: 'path-to-socket'
 });
 
@@ -36,10 +41,15 @@ net.on('message', { returnPath, data } => {
   }
 });
 
-// Send a message to the leader - with any valid JSON
-net.send({
-  type: 'request',
-});
+// Connect to the network
+net.connect()
+	.then(() => {
+		// Send a message to the leader - with any valid JSON
+		net.send({
+			type: 'request',
+		});
+	})
+	.catch(handleConnectionError);
 ```
 
 ## Low-level networks
@@ -71,4 +81,9 @@ net.on('connection', socket => {
   // Low-level networks requires the consumer to handle errors
   socket.on('error', handleErrorProperly);
 });
+
+// Connect to the network
+net.connect()
+	.then(...)
+	.catch(handleConnectionError);
 ```
