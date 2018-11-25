@@ -5,6 +5,8 @@ const fs = require('fs');
 const net = require('net');
 const EventEmitter = require('events');
 
+const eos = require('end-of-stream');
+
 const debug = require('debug')('local-machine-network');
 const pidlockfile = require('pidlockfile');
 
@@ -124,7 +126,7 @@ module.exports = class LowLevelNetwork extends EventEmitter {
 			}
 		});
 
-		client.on('close', err => {
+		eos(client, err => {
 			const retryTime = randomRetryTime();
 			if(err) {
 				debug('Disconnected from server with', err.code, '- retrying in', retryTime, 'ms');
@@ -134,7 +136,6 @@ module.exports = class LowLevelNetwork extends EventEmitter {
 
 			setTimeout(() => this.attemptConnectOrBind(callback), retryTime);
 		});
-
 	}
 
 	attemptBind(socketPath, callback) {
