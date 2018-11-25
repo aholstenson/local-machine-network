@@ -178,8 +178,12 @@ module.exports = class LowLevelNetwork extends EventEmitter {
 			});
 
 			server.on('error', err => {
-				// Something went wrong, attempt
-				debug('Error ocurred:', err);
+				// Something went wrong, close this server and reconnect
+				const retryTime = randomRetryTime();
+				debug('Error ocurred, retrying connection in', retryTime, 'ms. Error was:', err);
+
+				setTimeout(() => this.attemptConnectOrBind(callback), retryTime);
+				server.close();
 			});
 		});
 	}
