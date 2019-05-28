@@ -1,6 +1,6 @@
 {
   "name": "local-machine-network",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "license": "MIT",
   "description": "Create a machine local network with leader election",
   "repository": "aholstenson/local-machine-network",
