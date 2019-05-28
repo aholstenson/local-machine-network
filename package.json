@@ -9,20 +9,36 @@
     "socket",
     "leader-election"
   ],
+  "main": "./dist/cjs/index.js",
+  "types": "./dist/types/index.d.ts",
   "scripts": {
-    "test": "node_modules/.bin/eslint ."
+    "ci": "npm run run lint",
+    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "build": "tsc --module commonjs --target es5 --outDir dist/cjs",
+    "prebuild": "rimraf dist",
+    "prepublishOnly": "npm run build"
   },
   "engines": {
-    "node": ">=6.6.0"
+    "node": ">=8.0.0"
   },
   "dependencies": {
-    "debug": "^4.1.0",
-    "end-of-stream": "^1.4.1",
+    "@types/msgpack-lite": "^0.1.6",
+    "atvik": "^0.2.0",
+    "debug": "^4.1.1",
     "msgpack-lite": "^0.1.26",
-    "pidlockfile": "^1.1.1"
+    "proper-lockfile": "^4.1.1"
   },
   "devDependencies": {
-    "eslint": "^5.9.0",
-    "eslint-plugin-node": "^8.0.0"
+    "@types/debug": "^4.1.4",
+    "@types/jest": "^24.0.11",
+    "@types/node": "^8.0.0",
+    "@types/proper-lockfile": "^4.1.0",
+    "coveralls": "^3.0.3",
+    "jest": "^24.8.0",
+    "jest-config": "^24.8.0",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   }
 }

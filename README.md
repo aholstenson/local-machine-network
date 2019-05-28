@@ -22,15 +22,15 @@ const net = new ObjectNetwork({
   path: 'path-to-socket'
 });
 
-net.on('leader', () => {
+net.onLeader(() => {
   console.log('This instance is the leader!');
 });
 
-net.on('connection', other => {
+net.onConnection(other => {
   console.log('Incoming connection from someone else:', other);
 });
 
-net.on('message', { returnPath, data } => {
+net.onMessage({ returnPath, data } => {
   console.log('Got a message:', data);
 
   if(data.type === 'request') {
@@ -41,8 +41,8 @@ net.on('message', { returnPath, data } => {
   }
 });
 
-// Connect to the network
-net.connect()
+// Start the network
+net.start()
   .then(() => {
     // Send a message to the leader - with any valid JSON
     net.send({
@@ -61,29 +61,29 @@ const net = new LowLevelNetwork({
   path: 'path-to-socket'
 });
 
-net.on('leader', serverSocket => {
+net.onLeader(serverSocket => {
   console.log('This instance is the leader!');
 
   // Low-level networks requires the consumer to handle errors
   serverSocket.on('error', handleErrorProperly);
 });
 
-net.on('connected', socket => {
+net.onConnect(socket => {
   console.log('Connected to the leader:', socket);
 
   // Low-level networks requires the consumer to handle errors
   socket.on('error', handleErrorProperly);
 });
 
-net.on('connection', socket => {
+net.onConnection(socket => {
   console.log('Incoming connection from someone else:', socket);
 
   // Low-level networks requires the consumer to handle errors
   socket.on('error', handleErrorProperly);
 });
 
-// Connect to the network
-net.connect()
+// Start the network
+net.start()
   .then(...)
   .catch(handleConnectionError);
 ```

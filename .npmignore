@@ -1,0 +1,7 @@
+coverage
+examples
+tests
+.*
+docs
+tools
+socket*

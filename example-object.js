@@ -1,8 +1,8 @@
 'use strict';
 
-const { LowLevelNetwork } = require('./dist/cjs/low-level');
+const { ObjectNetwork } = require('./dist/cjs/object');
 
-const net = new LowLevelNetwork({
+const net = new ObjectNetwork({
 	path: 'socket-test'
 });
 
@@ -12,10 +12,20 @@ net.onLeader(socket => {
 
 net.onConnect(socket => {
 	console.log('Connected to the leader');
+
+	socket.send('Ping');
 });
 
 net.onConnection(socket => {
 	console.log('Incoming connection from someone else');
+
+	socket.send('Hello');
+});
+
+net.onMessage(msg => {
+	console.log('Received a message from someone else');
+
+	console.log(msg);
 });
 
 net.start()
