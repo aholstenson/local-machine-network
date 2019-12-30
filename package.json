@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@types/msgpack-lite": "^0.1.6",
-    "atvik": "^0.2.0",
+    "atvik": "^1.0.0",
     "debug": "^4.1.1",
     "msgpack-lite": "^0.1.26",
     "proper-lockfile": "^4.1.1"
