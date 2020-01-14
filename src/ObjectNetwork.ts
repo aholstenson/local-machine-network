@@ -1,7 +1,7 @@
 import { Event } from 'atvik';
 import debug from 'debug';
 
-import { LowLevelNetwork } from './low-level';
+import { LowLevelNetwork } from './LowLevelNetwork';
 import { Socket } from 'net';
 
 import msgpack from 'msgpack-lite';
