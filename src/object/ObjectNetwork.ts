@@ -59,8 +59,9 @@ export interface ObjectMessage {
 
 /**
  * Adapter over a low-level network for those cases where clients want to
- * exchange objects with the leader. This implementation will use MessagePack
- * to encode and decode objects.
+ * exchange objects with the leader. This implementation will use a codec
+ * to transform objects to and from a binary format sent between the peers of
+ * the network.
  */
 export class ObjectNetwork {
 	private debug: debug.Debugger;

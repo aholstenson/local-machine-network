@@ -16,10 +16,12 @@ npm install local-machine-network
 ## Object based messaging
 
 ```javascript
-const { ObjectNetwork } = require('local-machine-network');
+const { ObjectNetwork, JSONCodec } = require('local-machine-network');
 
 const net = new ObjectNetwork({
-  path: 'path-to-socket'
+  path: 'path-to-socket',
+
+  codec: JSONCodec
 });
 
 net.onLeader(() => {
