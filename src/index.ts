@@ -1,2 +1,3 @@
 export * from './LowLevelNetwork';
-export * from './ObjectNetwork';
+
+export * from './object';

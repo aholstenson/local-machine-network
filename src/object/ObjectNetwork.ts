@@ -1,10 +1,10 @@
 import { Event } from 'atvik';
 import debug from 'debug';
 
-import { LowLevelNetwork } from './LowLevelNetwork';
+import { LowLevelNetwork } from '../LowLevelNetwork';
 import { Socket } from 'net';
-
-import msgpack from 'msgpack-lite';
+import { ObjectCodec } from './ObjectCodec';
+import { PacketDecodingStream, encodePacket } from './packets';
 
 const connectEvent = Symbol('connectEvent');
 const disconnectEvent = Symbol('disconnectEvent');
@@ -27,6 +27,11 @@ export interface ObjectNetworkOptions {
 	 * Path at which the network should create its socket.
 	 */
 	path: string;
+
+	/**
+	 * The codec that is used for messages.
+	 */
+	codec: ObjectCodec;
 }
 
 /**
@@ -63,6 +68,8 @@ export class ObjectNetwork {
 
 	private connection?: ObjectSocket;
 
+	private readonly codec: ObjectCodec;
+
 	private [connectEvent]: Event<this, [ ObjectSocket ]>;
 	private [connectionEvent]: Event<this, [ ObjectSocket ]>;
 	private [leaderEvent]: Event<this, [ ]>;
@@ -72,11 +79,24 @@ export class ObjectNetwork {
 	 * Create a new object network.
 	 */
 	constructor(options: ObjectNetworkOptions) {
+		if(! options) {
+			throw new Error('options are required');
+		}
+
+		if(! options.path) {
+			throw new Error('path needs to be specified');
+		}
+
+		if(! options.codec) {
+			throw new Error('codec needs to be specified');
+		}
 
 		this.debug = debug('local-machine-network:' + (options.id || ('[' + options.path + ']')));
 
 		// Create the low-level network
 		this.lowLevel = new LowLevelNetwork(options);
+
+		this.codec = options.codec;
 
 		this[connectEvent] = new Event(this);
 		this[connectionEvent] = new Event(this);
@@ -113,7 +133,9 @@ export class ObjectNetwork {
 
 				emitMessage: (msg) => this[messageEvent].emit(msg),
 
-				send: this.send.bind(this)
+				send: this.send.bind(this),
+
+				codec: this.codec
 			});
 
 			this[connectionEvent].emit(connection);
@@ -131,7 +153,9 @@ export class ObjectNetwork {
 
 				emitMessage: (msg) => this[messageEvent].emit(msg),
 
-				send: this.send.bind(this)
+				send: this.send.bind(this),
+
+				codec: this.codec
 			});
 
 			this[connectEvent].emit(connection);
@@ -196,6 +220,8 @@ interface ObjectSocketControl {
 	debug: debug.Debugger;
 
 	socket: Socket;
+
+	codec: ObjectCodec;
 }
 
 export class ObjectSocket {
@@ -219,16 +245,17 @@ export class ObjectSocket {
 		control.socket.on('close', () => this[disconnectEvent].emit());
 
 		// Setup the decoder for incoming messages
-		const decoder = msgpack.createDecodeStream();
+		const decoder = new PacketDecodingStream();
 		const pipe = control.socket.pipe(decoder);
 
 		// When data is received emit an event
 		decoder.on('data', data => {
-			control.debug('Received message:', data);
+			const msg = control.codec.decode(data);
+			control.debug('Received message:', msg);
 
 			const message: ObjectMessage = {
 				returnPath: this,
-				data: data
+				data: msg
 			};
 
 			control.emitMessage(message);
@@ -254,10 +281,11 @@ export class ObjectSocket {
 	 * @param {*} message
 	 */
 	public send(message: any) {
-		const data = msgpack.encode(message);
+		const data = this.control.codec.encode(message);
+		const packet = encodePacket(data);
 		try {
 			this.control.debug('Sending message to leader:', message);
-			this.control.socket.write(data);
+			this.control.socket.write(packet);
 		} catch(err) {
 			this.control.debug('Could not write, got an error:', err);
 		}
