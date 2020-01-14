@@ -1,6 +1,6 @@
 'use strict';
 
-const { LowLevelNetwork } = require('./dist/cjs/low-level');
+const { LowLevelNetwork } = require('./');
 
 const net = new LowLevelNetwork({
 	path: 'socket-test'

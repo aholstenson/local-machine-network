@@ -1,9 +1,11 @@
 'use strict';
 
-const { ObjectNetwork } = require('./dist/cjs/object');
+const { ObjectNetwork, JSONCodec } = require('./');
 
 const net = new ObjectNetwork({
-	path: 'socket-test'
+	path: 'socket-test',
+
+	codec: JSONCodec
 });
 
 net.onLeader(socket => {
