@@ -65,23 +65,14 @@ const net = new LowLevelNetwork({
 
 net.onLeader(serverSocket => {
   console.log('This instance is the leader!');
-
-  // Low-level networks requires the consumer to handle errors
-  serverSocket.on('error', handleErrorProperly);
 });
 
 net.onConnect(socket => {
   console.log('Connected to the leader:', socket);
-
-  // Low-level networks requires the consumer to handle errors
-  socket.on('error', handleErrorProperly);
 });
 
 net.onConnection(socket => {
   console.log('Incoming connection from someone else:', socket);
-
-  // Low-level networks requires the consumer to handle errors
-  socket.on('error', handleErrorProperly);
 });
 
 // Start the network
