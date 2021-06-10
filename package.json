@@ -22,21 +22,21 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "atvik": "^1.0.0",
+    "atvik": "^2.0.0",
     "debug": "^4.3.1",
     "proper-lockfile": "^4.1.2"
   },
   "devDependencies": {
     "@types/debug": "^4.1.5",
-    "@types/jest": "^26.0.22",
-    "@types/node": "^14.14.37",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.12.2",
     "@types/proper-lockfile": "^4.1.1",
     "coveralls": "^3.1.0",
-    "jest": "^26.6.3",
-    "jest-config": "^26.6.3",
+    "jest": "^27.0.4",
+    "jest-config": "^27.0.4",
     "rimraf": "^3.0.2",
-    "ts-jest": "^26.5.4",
+    "ts-jest": "^27.0.3",
     "tslint": "^6.1.3",
-    "typescript": "^4.2.4"
+    "typescript": "^4.3.2"
   }
 }
