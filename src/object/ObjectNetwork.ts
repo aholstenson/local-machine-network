@@ -1,8 +1,10 @@
+import { Socket } from 'net';
+
 import { Event } from 'atvik';
 import debug from 'debug';
 
 import { LowLevelNetwork } from '../LowLevelNetwork';
-import { Socket } from 'net';
+
 import { ObjectCodec } from './ObjectCodec';
 import { PacketDecodingStream, encodePacket } from './packets';
 
@@ -78,8 +80,11 @@ export class ObjectNetwork {
 
 	/**
 	 * Create a new object network.
+	 *
+	 * @param options -
+	 *   options for the network
 	 */
-	constructor(options: ObjectNetworkOptions) {
+	public constructor(options: ObjectNetworkOptions) {
 		if(! options) {
 			throw new Error('options are required');
 		}
@@ -132,7 +137,7 @@ export class ObjectNetwork {
 
 				debug: this.debug,
 
-				emitMessage: (msg) => this[messageEvent].emit(msg),
+				emitMessage: msg => this[messageEvent].emit(msg),
 
 				send: this.send.bind(this),
 
@@ -147,40 +152,44 @@ export class ObjectNetwork {
 		 * save a reference to the connection.
 		 */
 		this.lowLevel.onConnect(socket => {
-			const connection = this.connection = new ObjectSocket({
+			const connection = new ObjectSocket({
 				socket: socket,
 
 				debug: this.debug,
 
-				emitMessage: (msg) => this[messageEvent].emit(msg),
+				emitMessage: msg => this[messageEvent].emit(msg),
 
 				send: this.send.bind(this),
 
 				codec: this.codec
 			});
 
+			this.connection = connection;
 			this[connectEvent].emit(connection);
 		});
 	}
 
-	get onConnect() {
+	public get onConnect() {
 		return this[connectEvent].subscribable;
 	}
 
-	get onLeader() {
+	public get onLeader() {
 		return this[leaderEvent].subscribable;
 	}
 
-	get onConnection() {
+	public get onConnection() {
 		return this[connectionEvent].subscribable;
 	}
 
-	get onMessage() {
+	public get onMessage() {
 		return this[messageEvent].subscribable;
 	}
 
 	/**
 	 * Connect to the network.
+	 *
+	 * @returns
+	 *   promise that resolves when network is started
 	 */
 	public start(): Promise<void> {
 		return this.lowLevel.start();
@@ -188,6 +197,9 @@ export class ObjectNetwork {
 
 	/**
 	 * Disconnect from the network.
+	 *
+	 * @returns
+	 *   promise that resolve when the network stops
 	 */
 	public stop() {
 		return this.lowLevel.stop();
@@ -195,6 +207,9 @@ export class ObjectNetwork {
 
 	/**
 	 * Send a message to the current leader.
+	 *
+	 * @param message -
+	 *   message to send
 	 */
 	public send(message: any) {
 		if(this.lowLevel.leader) {
@@ -231,7 +246,7 @@ export class ObjectSocket {
 	private [disconnectEvent]: Event<this>;
 	private [messageEvent]: Event<this, [ ObjectMessage ]>;
 
-	constructor(control: ObjectSocketControl) {
+	public constructor(control: ObjectSocketControl) {
 		this.control = control;
 
 		this[disconnectEvent] = new Event(this);
@@ -268,18 +283,19 @@ export class ObjectSocket {
 		pipe.on('error', err => control.debug('Error from pipe', err));
 	}
 
-	get onDisconnect() {
+	public get onDisconnect() {
 		return this[disconnectEvent].subscribable;
 	}
 
-	get onMessage() {
+	public get onMessage() {
 		return this[messageEvent].subscribable;
 	}
 
 	/**
 	 * Send a message to this instance.
 	 *
-	 * @param {*} message
+	 * @param message -
+	 *   message to send
 	 */
 	public send(message: any) {
 		const data = this.control.codec.encode(message);

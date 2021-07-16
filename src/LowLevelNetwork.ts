@@ -1,9 +1,8 @@
-import path from 'path';
 import { unlink } from 'fs';
 import { Socket, Server, connect, createServer } from 'net';
+import path from 'path';
 
 import { Event } from 'atvik';
-
 import debug from 'debug';
 import { lock } from 'proper-lockfile';
 
@@ -24,8 +23,13 @@ export interface LowLevelNetworkOptions {
 
 /**
  * Resolve the given path to a path that can be used with an IPC socket.
+ *
+ * @param p -
+ *   path to resolve
+ * @returns
+ *   resolved path
  */
-function toSocketPath(p: string) {
+function toSocketPath(p: string): string {
 	const resolved = path.resolve(p);
 	if(process.platform === 'win32') {
 		// On Windows IPC sockets need to be either in \\?\pipe\ or \\.\pipe\
@@ -38,9 +42,12 @@ function toSocketPath(p: string) {
 
 /**
  * Generate a random retry time between 30 and 130 ms.
+ *
+ * @returns
+ *   time in milliseconds
  */
 function randomRetryTime() {
-	return Math.floor(30 + Math.random() * 100);
+	return Math.floor(30 + (Math.random() * 100));
 }
 
 const client = Symbol('client');
@@ -80,7 +87,7 @@ export class LowLevelNetwork {
 	private [connectionEvent]: Event<this, [ Socket ]>;
 	private [leaderEvent]: Event<this, [ Server ]>;
 
-	constructor(options: LowLevelNetworkOptions) {
+	public constructor(options: LowLevelNetworkOptions) {
 		if(typeof options !== 'object') {
 			throw new Error('Options are needed to create a new network');
 		}
@@ -106,23 +113,42 @@ export class LowLevelNetwork {
 		this[leaderEvent] = new Event(this);
 	}
 
-	get onConnect() {
+	public get onConnect() {
 		return this[connectEvent].subscribable;
 	}
 
-	get onConnection() {
+	public get onConnection() {
 		return this[connectionEvent].subscribable;
 	}
 
-	get onLeader() {
+	/**
+	 * Event emitted when this instance becomes the leader of the local
+	 * network.
+	 *
+	 * @returns
+	 *   subscribable
+	 */
+	public get onLeader() {
 		return this[leaderEvent].subscribable;
 	}
 
-	get onReady() {
+	/**
+	 * Event emitted when this instance becomes ready.
+	 *
+	 * @returns
+	 *   subscribable
+	 */
+	public get onReady() {
 		return this[readyEvent].subscribable;
 	}
 
-	get onError() {
+	/**
+	 * Event emitted if an error occurs.
+	 *
+	 * @returns
+	 *   subscribable
+	 */
+	public get onError() {
 		return this[errorEvent].subscribable;
 	}
 
@@ -143,7 +169,7 @@ export class LowLevelNetwork {
 				resolve();
 			});
 
-			const errorHandle = this.onError((err) => {
+			const errorHandle = this.onError(() => {
 				readyHandle.unsubscribe();
 				errorHandle.unsubscribe();
 
@@ -198,7 +224,7 @@ export class LowLevelNetwork {
 				}
 			}
 		})
-			.then((release) => {
+			.then(release => {
 				/**
 				 * We now have the lock, try creating a server.
 				 */
@@ -220,6 +246,9 @@ export class LowLevelNetwork {
 	/**
 	 * Unsafe: Release the lock if we have it. This is done if the server
 	 * fails to bind or if the network is disconnected.
+	 *
+	 * @returns
+	 *   promise that resolves when the lock is released
 	 */
 	private _releaseLock(): Promise<void> {
 		const release = this[releaseLock];
@@ -274,7 +303,6 @@ export class LowLevelNetwork {
 		socket.on('close', hadError => {
 			if(hadError) return;
 			// Mark the client as non-existent
-			const hadConnected = !! this[client];
 			this[client] = undefined;
 
 			// Request a reconnect
@@ -282,7 +310,7 @@ export class LowLevelNetwork {
 		});
 	}
 
-	private attemptBind(socketPath: string, attempt=0): void {
+	private attemptBind(socketPath: string, attempt = 0): void {
 		if(attempt > 10) {
 			// Already tried to bind 10 times - just give up at this point
 			this.debug('Could not bind server socket, giving up after 10 tries');
@@ -361,7 +389,7 @@ export class LowLevelNetwork {
 				serverSocket.close(() => {
 					// First unlink the socket path
 					const socketPath = toSocketPath(this.options.path);
-					unlink(socketPath, err => {
+					unlink(socketPath, () => {
 						this._releaseLock()
 							.then(resolve)
 							.catch(reject);
@@ -371,7 +399,7 @@ export class LowLevelNetwork {
 		} else {
 			const clientSocket = this[client];
 			if(clientSocket) {
-				return new Promise((resolve, reject) => {
+				return new Promise(resolve => {
 					clientSocket.destroy();
 					resolve();
 				});

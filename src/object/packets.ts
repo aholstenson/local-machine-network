@@ -11,7 +11,7 @@ const MAX_UINT32 = Math.pow(2, 32) - 1;
 export class PacketDecodingStream extends Transform {
 	private buffer: Buffer = Buffer.alloc(0);
 
-	constructor() {
+	public constructor() {
 		super({
 			objectMode: true
 		});
@@ -75,6 +75,14 @@ export class PacketDecodingStream extends Transform {
 	}
 }
 
+/**
+ * Encode some data into a packet.
+ *
+ * @param data -
+ *   data to encode
+ * @returns
+ *   data with packet header
+ */
 export function encodePacket(data: Buffer): Buffer {
 	// Encode the length as a CBOR value
 	const length = data.length;
