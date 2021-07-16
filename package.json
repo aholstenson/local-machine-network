@@ -1,6 +1,6 @@
 {
   "name": "local-machine-network",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "license": "MIT",
   "description": "Create a machine local network with leader election",
   "repository": "aholstenson/local-machine-network",
@@ -33,7 +33,6 @@
     "@typescript-eslint/eslint-plugin": "^4.28.3",
     "@typescript-eslint/parser": "^4.28.3",
     "coveralls": "^3.1.1",
-
     "eslint": "^7.30.0",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jsdoc": "^35.4.3",
